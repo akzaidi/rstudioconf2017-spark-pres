@@ -1,0 +1,3 @@
+"0","fico_year <- freddie %>% group_by(orig_year, state) %>% "
+"0","  summarise(ave_fico = mean(credit_score)) %>% collect"
+"0","fico_year %>% head"

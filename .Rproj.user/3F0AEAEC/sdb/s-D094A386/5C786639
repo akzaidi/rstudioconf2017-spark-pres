@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "---\ntitle: \"Data Manipulation with the sparklyr Package\"\noutput: html_document\n---\n\n# Create Spark Context\n\nThe `sparklyr` package has a handy function for creating a Spark context. This differs from the method that is used by the `SparkR` package.\n\n```{r spark_context}\nif (\"SparkR\" %in% loadedNamespaces()) detach(\"package:SparkR\", unload = TRUE)\n\nlibrary(sparklyr)\nsc <- spark_connect(master = \"yarn-client\")\n\n```\n\n# View Data Directory\n\n```{r download_data}\n\nwasb_taxi <- \"/user/RevoShare/remoteuser/nyctaxi/data/\"\nhdfs_ls <- paste0(\"hadoop fs -ls \", wasb_taxi)\nsystem(hdfs_ls)\n```\n\n\n\n# Import Data\n\nTo import data from csv files, we can use the `spark_read_csv` function, which is basically a wrapper for the `read.df` function using the __databricks.spark.csv__ package.\n\n```{r import_csv}\n\ntaxi <- spark_read_csv(sc,\n                       path = wasb_taxi,\n                       \"taxisample\",\n                       header = TRUE)\n\n\n```\n\n\n## Exploratory Data Analysis\n\n```{r counts_year}\nlibrary(dplyr)\n\ntaxi %>% count\n\nyear_counts <- taxi %>% \n  mutate(year = year(tpep_pickup_datetime )) %>%\n  group_by(year) %>%\n  summarize(num_trips = n()) %>%\n  collect()\n\nmonthly_counts <- taxi %>% \n  mutate(year = year(tpep_pickup_datetime ),\n         month = month(tpep_pickup_datetime )) %>% \n  group_by(month, year) %>% \n  summarize(num_trips = n()) %>% \n  collect()\n\n```\n\n## Visualize Trip Durations\n\n```{r}\n\nlibrary(ggplot2)\n\npickup_dropoff_tbl <- taxi %>%\n  mutate(pickup_hour = hour(tpep_pickup_datetime)) %>%\n  mutate(trip_time = unix_timestamp(tpep_dropoff_datetime) - unix_timestamp(tpep_pickup_datetime)) %>%\n  group_by(pickup_hour) %>% \n  summarize(n = n(),\n            trip_time_mean = mean(trip_time),\n            trip_time_p10 = percentile(trip_time, 0.10),\n            trip_time_p25 = percentile(trip_time, 0.25),\n            trip_time_p50 = percentile(trip_time, 0.50),\n            trip_time_p75 = percentile(trip_time, 0.75),\n            trip_time_p90 = percentile(trip_time, 0.90))\n# Collect results\npickup_dropoff <- collect(pickup_dropoff_tbl)\n# Plot\nggplot(pickup_dropoff, aes(x = pickup_hour)) +\n          geom_line(aes(y = trip_time_p50, alpha = \"Median\")) +\n          geom_ribbon(aes(ymin = trip_time_p25, ymax = trip_time_p75, \n                          alpha = \"25–75th percentile\")) +\n          geom_ribbon(aes(ymin = trip_time_p10, ymax = trip_time_p90, \n                          alpha = \"10–90th percentile\")) +\n          scale_y_continuous(\"trip duration in minutes\")\n```\n\n",
+    "created" : 1484317934705.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1138488301",
+    "id" : "5C786639",
+    "lastKnownWriteTime" : 1484316411,
+    "last_content_update" : 1484316411,
+    "path" : "~/mlads_spark_tutorial/1-taxi-eda.Rmd",
+    "project_path" : null,
+    "properties" : {
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

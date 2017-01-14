@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "\n# Notes -------------------------------------------------------------------\n\n## before being able to compile packages with gcc, you may need to update\n## the $R_HOME/etc/Makeconf\n## see https://github.com/Microsoft/microsoft-r-open/issues/11\n\n\n# Update MRAN Mirror ------------------------------------------------------\n\n\nr <- getOption(\"repos\")\nmran_date <- Sys.Date() - 1\nr[[\"CRAN\"]] <- paste0(\"https://mran.revolutionanalytics.com/snapshot/\", mran_date)\noptions(repos = r)\n\n# Install tidyverse and sparklyr ------------------------------------------\n\n\ninstall.packages('devtools')\ndevtools::install_github(\"tidyverse/tidyverse\")\ninstall.packages(c('plotly'))\n\ndevtools::install_github(\"rstudio/sparklyr\")\ndevtools::install_github('yihui/xaringan')\n\n\n\n# text packages -----------------------------------------------------------\n\ndevtools::install_github(\"juliasilge/tidytext\")\n",
+    "created" : 1484316647838.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1178298806",
+    "id" : "B63FA01E",
+    "lastKnownWriteTime" : 1484317921,
+    "last_content_update" : 1484317921581,
+    "path" : "~/rstudioconf-spark-pres/0-package-prereqs.r",
+    "project_path" : "0-package-prereqs.r",
+    "properties" : {
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
